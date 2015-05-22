@@ -8,6 +8,12 @@ aggregated data in Memcached to produce useful graphs for monitoring your webser
 you to also collect access log data from multiple webservers concurrently and aggregate them in one
 or multiple places.
 
+## How It Works
+
+![webSAT Flowchart](http://i.imgur.com/Y3Isvac.png)
+
+We equip your webserver with a beacon, that sends out signals about what your webserver is doing. These signals are then captured by a satellite, which transmitts them to a station that has one or more microwaves. If a given microwave tuned to the beacon's signal knows what to do with that signal it can process it, otherwise it is discarded.
+
 ## Quick Start Guide
 
 The easiest way to use webSAT is through Apache httpd's piped logging facility. Simply clone the
