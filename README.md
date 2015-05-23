@@ -29,15 +29,17 @@ First, to clear up some things, let's explain what all these terms mean...
 
 Term          | Definition
 ------------- | -------------
-`Satellite`   | A Satellite is the PULL mechanism of the consumer in this PUSH/PULL topology
-`Beacon`      | A Beacon is the PUSH mechanism of the producer in this PUSH/PULL topology
-`Signal`      | A Signal is what a Beacon will transmit to a Satellite and is comprised of two parts (namely: a _designation_ and a _payload_)
-`Microwave`   | A Microwave is the worker mechanism of the consumer, which does the actual work when consuming a given Signal
-`Station`     | A Station is the collection of consumer mechanisms, including the Satellite and one or more Microwaves (_workers_)
+__Satellite__   | A Satellite is the PULL mechanism of the consumer in this PUSH/PULL topology
+__Beacon__      | A Beacon is the PUSH mechanism of the producer in this PUSH/PULL topology
+__Signal__      | A Signal is what a Beacon will transmit to a Satellite and is comprised of two parts (namely: a _designation_ and a _payload_)
+__Microwave__   | A Microwave is the worker mechanism of the consumer, which does the actual work when consuming a given Signal
+__Station__     | A Station is the collection of consumer mechanisms, including the Satellite and one or more Microwaves (_workers_)
 
 A `Station` can only have a single `Satellite` (this is the thing pulling in the actual messages off the queue), but multiple `Microwave`s (the thing doing the actual work). Each `Microwave` can have one or more _designations_. When the `Station` receives a `Signal` from the `Satellite`, it will ask all of its `Microwave`s if they have the given _designation_ in the incoming `Signal`. If the `Microwave` has such _designation_ it will be handed the `Signal` for processing. It is possible for more than one `Microwave` to have the same _designation(s)_, since the same `Signal` may be consumed by more than one worker in a given `Station`. Once a message is consumed by the `Satellite`, however, it can not be consumed again by the same `Satellite`. It's the `Station`'s job to hand off `Signal`s to its `Microwave`s after consumption from a `Satellite`.
 
-Each `Microwave` implements a `Worker` interface, which extends a `Microwave` _abstract_ class. Each `Microwave` (_worker_) then has to implement four basic methods. The `onStart`, `onStop`, `onRecieve`, and `hasDesignation` methods. The `hasDesignation` method must always return a boolean `true`/`false` and accepts a `Signal` argument. If `Microwave::hasDesignation()` returns `true`, the `Signal` is handed to that `Microwave`'s `onReceive` callback method for processing.
+Each `Microwave` implements a `Worker` interface. You can extend the `Microwave` _abstract_ class directly to create your worker, or simply implement the `Worker` interface yourself directly. Each `Microwave` (_worker_) then has to implement four basic methods. The `onStart`, `onStop`, `onRecieve`, and `hasDesignation` methods. The `hasDesignation` method must always return a boolean `true`/`false` and accepts a `Signal` argument. If `Microwave::hasDesignation()` returns `true`, the `Signal` is handed to that `Microwave`'s `onReceive` callback method for processing.
+
+It is possible to connect multiple `Satellite`s together by having one `Microwave` hand messages off to antoher `Satellite` via another `Beacon`. Multiple `Beacon`'s may all talk to the same `Satellite`. This allows you to build distributed topologies within the existing primitive topology.
 
 ## Benefits
 
